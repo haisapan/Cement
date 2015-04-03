@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="saleDBModel.Store" Provider="System.Data.SQLite.EF6" ProviderManifestToken="data source=&quot;C:\Users\haisa.pan\Documents\Visual Studio 2013\Projects\Job\SaleSystem\SaleSystem\App_Data\saleDB&quot;" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Cement">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="integer" Nullable="false" />
+          <Property Name="CustomerId" Type="int" Nullable="false" />
+          <Property Name="CustomerName" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
+          <Property Name="ProductionId" Type="int" Nullable="false" />
+          <Property Name="ProductionName" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
+          <Property Name="SendWeight" Type="real" Nullable="false" />
+          <Property Name="ReceiveWeight" Type="real" Nullable="false" />
+          <Property Name="SendUnitPrice" Type="real" Nullable="false" />
+          <Property Name="ReceiveUnitPrice" Type="real" Nullable="false" />
+          <Property Name="TransferUnitPriceInContract" Type="real" Nullable="false" />
+          <Property Name="ReceiveTransferUnitPrice" Type="real" Nullable="false" />
+          <Property Name="DriverName" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
+          <Property Name="PaidAmount" Type="real" Nullable="false" />
+          <Property Name="OverDraft" Type="real" />
+          <Property Name="CreatedTime" Type="datetime" />
+        </EntityType>
+        <EntityContainer Name="saleDBModelStoreContainer">
+          <EntitySet Name="Cement" EntityType="Self.Cement" store:Type="Tables" />
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="saleDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Cement">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int64" Nullable="false" />
+          <Property Name="CustomerId" Type="Int32" Nullable="false" />
+          <Property Name="CustomerName" Type="String" MaxLength="2147483647" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ProductionId" Type="Int32" Nullable="false" />
+          <Property Name="ProductionName" Type="String" MaxLength="2147483647" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="SendWeight" Type="Double" Nullable="false" />
+          <Property Name="ReceiveWeight" Type="Double" Nullable="false" />
+          <Property Name="SendUnitPrice" Type="Double" Nullable="false" />
+          <Property Name="ReceiveUnitPrice" Type="Double" Nullable="false" />
+          <Property Name="TransferUnitPriceInContract" Type="Double" Nullable="false" />
+          <Property Name="ReceiveTransferUnitPrice" Type="Double" Nullable="false" />
+          <Property Name="DriverName" Type="String" MaxLength="2147483647" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PaidAmount" Type="Double" Nullable="false" />
+          <Property Name="OverDraft" Type="Double" />
+          <Property Name="CreatedTime" Type="DateTime" />
+        </EntityType>
+        <EntityContainer Name="saleDBEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Cement" EntityType="Self.Cement" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="saleDBModelStoreContainer" CdmEntityContainer="saleDBEntities">
+          <EntitySetMapping Name="Cement">
+            <EntityTypeMapping TypeName="saleDBModel.Cement">
+              <MappingFragment StoreEntitySet="Cement">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
+                <ScalarProperty Name="CustomerName" ColumnName="CustomerName" />
+                <ScalarProperty Name="ProductionId" ColumnName="ProductionId" />
+                <ScalarProperty Name="ProductionName" ColumnName="ProductionName" />
+                <ScalarProperty Name="SendWeight" ColumnName="SendWeight" />
+                <ScalarProperty Name="ReceiveWeight" ColumnName="ReceiveWeight" />
+                <ScalarProperty Name="SendUnitPrice" ColumnName="SendUnitPrice" />
+                <ScalarProperty Name="ReceiveUnitPrice" ColumnName="ReceiveUnitPrice" />
+                <ScalarProperty Name="TransferUnitPriceInContract" ColumnName="TransferUnitPriceInContract" />
+                <ScalarProperty Name="ReceiveTransferUnitPrice" ColumnName="ReceiveTransferUnitPrice" />
+                <ScalarProperty Name="DriverName" ColumnName="DriverName" />
+                <ScalarProperty Name="PaidAmount" ColumnName="PaidAmount" />
+                <ScalarProperty Name="OverDraft" ColumnName="OverDraft" />
+                <ScalarProperty Name="CreatedTime" ColumnName="CreatedTime" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="无" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
