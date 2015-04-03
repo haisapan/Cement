@@ -12,6 +12,9 @@
     label {
         max-width: 280px ;
     }
+    .form-control {
+        border-width: 1px !important;
+    }
 
 </style>
 
@@ -152,7 +155,7 @@
             <div class="form-group">
                 <label class="control-label col-md-2">出厂单价：</label>
                 <div class="col-md-10">
-                    <input class="form-control" name="SendUnitPrice" ng-model="data.SendUnitPrice" type="text" required />
+                    <input class="form-control" name="SendUnitPrice" ng-model="data.SendUnitPrice" type="number" required />
                 </div>
             </div>
 
