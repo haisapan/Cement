@@ -4,12 +4,12 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="saleDBModel.Store" Provider="System.Data.SQLite.EF6" ProviderManifestToken="data source=&quot;C:\Users\haisa.pan\Documents\Visual Studio 2013\Projects\Job\SaleSystem\SaleSystem\App_Data\saleDB&quot;" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="saleDBModel.Store" Provider="System.Data.SQLite.EF6" ProviderManifestToken="data source=&quot;C:\Users\haisa.pan\Documents\Visual Studio 2013\Projects\Job\SaleSystem\SaleSystem\App_Data\saleDB&quot;" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Cement">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="integer" Nullable="false" />
+          <Property Name="Id" Type="integer" Nullable="false" StoreGeneratedPattern="Identity" />
           <Property Name="CustomerId" Type="int" Nullable="false" />
           <Property Name="CustomerName" Type="nvarchar" MaxLength="2147483647" Nullable="false" />
           <Property Name="ProductionId" Type="int" Nullable="false" />
@@ -24,12 +24,12 @@
           <Property Name="PaidAmount" Type="real" Nullable="false" />
           <Property Name="OverDraft" Type="real" />
           <Property Name="CreatedTime" Type="datetime" />
+          <Property Name="Remark" Type="nvarchar" MaxLength="2147483647" />
         </EntityType>
         <EntityContainer Name="saleDBModelStoreContainer">
           <EntitySet Name="Cement" EntityType="Self.Cement" store:Type="Tables" />
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="saleDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -37,7 +37,7 @@
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="Int64" Nullable="false" />
+          <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="CustomerId" Type="Int32" Nullable="false" />
           <Property Name="CustomerName" Type="String" MaxLength="2147483647" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="ProductionId" Type="Int32" Nullable="false" />
@@ -52,6 +52,7 @@
           <Property Name="PaidAmount" Type="Double" Nullable="false" />
           <Property Name="OverDraft" Type="Double" />
           <Property Name="CreatedTime" Type="DateTime" />
+          <Property Name="Remark" Type="String" MaxLength="2147483647" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityContainer Name="saleDBEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Cement" EntityType="Self.Cement" />
@@ -65,6 +66,7 @@
           <EntitySetMapping Name="Cement">
             <EntityTypeMapping TypeName="saleDBModel.Cement">
               <MappingFragment StoreEntitySet="Cement">
+                <ScalarProperty Name="Remark" ColumnName="Remark" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
                 <ScalarProperty Name="CustomerName" ColumnName="CustomerName" />

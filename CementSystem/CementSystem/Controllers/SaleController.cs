@@ -39,8 +39,13 @@ namespace CementSystem.Controllers
                 saleDBEntities saleDbEntities = new saleDBEntities();
                 saleDbEntities.Cement.Add(model);
                 saleDbEntities.SaveChanges();
-
-                return RedirectToAction("Index");
+                var result = new
+                {
+                    Successed = true,
+                    Error = "",
+                    Message = ""
+                };
+                return Json(result);
             }
             catch
             {

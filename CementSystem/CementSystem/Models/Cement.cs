@@ -29,5 +29,6 @@ namespace CementSystem.Models
         public double PaidAmount { get; set; }
         public Nullable<double> OverDraft { get; set; }
         public Nullable<System.DateTime> CreatedTime { get; set; }
+        public string Remark { get; set; }
     }
 }

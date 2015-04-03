@@ -12,6 +12,7 @@ namespace CementSystem
         public static void RegisterRoutes(RouteCollection routes)
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
+            routes.IgnoreRoute("{resource}.json/{*pathInfo}");
 
             routes.MapRoute(
                 name: "Default",

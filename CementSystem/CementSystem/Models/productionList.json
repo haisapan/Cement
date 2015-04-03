@@ -1,0 +1,10 @@
+﻿[
+            { "id": 1, "productionName": "散PCR32.5" },
+            { "id": 2, "productionName": "散PC32.5" },
+            { "id": 3, "productionName":"散PO42.5" },
+           { "id": 4, "productionName":"散52.5" },
+            { "id": 5, "productionName":"袋PCR32.5" },
+           { "id": 6, "productionName":"袋PC32.5" },
+          { "id": 7, "productionName":"袋PO42.5" },
+          { "id": 8, "productionName": "其他" }
+]

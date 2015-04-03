@@ -3,137 +3,256 @@
 @{
     ViewBag.Title = "Create";
 }
+<script src="~/Scripts/jcs-auto-validate.js"></script>
+<link href="~/Content/bootstrap-datepicker3.min.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-datepicker.min.js"></script>
+<script src="~/Scripts/bootstrap-datepicker.zh-CN.min.js"></script>
+
+<style>
+    label {
+        max-width: 280px ;
+    }
+
+</style>
+
+<script>
+    var cementApp = angular.module('cementApp', ['jcs-autoValidate']);
+    cementApp.controller('cementController', ["$scope", "$http", "$window", "$timeout", 'bootstrap3ElementModifier', function ($scope, $http, $window, $timeout,bootstrap3ElementModifier) {
+        $scope.data = {};
+        $scope.cement = {};
+
+        //load production list
+        $http.get('@Url.Content("~/Models/productionList.json")').success(function (data) {
+            if (data&&data.length>0) {
+                $scope.cement.productionList = data;
+                $scope.data.Production= $scope.cement.productionList[0];
+            }
+
+        
+        });
+
+        //todo move to json file , then can easy to maintain it
+        //$scope.cement.productionList = [
+        //    { id: 0, productionName: "散PCR32.5" },
+        //    { id: 0, productionName: "散PC32.5" },
+        //    { id: 0, productionName: "散PO42.5" },
+        //    { id: 0, productionName: "散52.5" },
+        //    { id: 0, productionName: "袋PCR32.5" },
+        //    { id: 0, productionName: "袋PC32.5" },
+        //    { id: 0, productionName: "袋PO42.5" },
+        //    { id: 0, productionName: "其他" }
+        //];
+
+        $timeout(function() {
+            $("#CreatedTime").datepicker({
+                language: "zh-CN",
+                calendarWeeks: true,
+                autoclose: true,
+                todayHighlight: true
+            });
+        });
+
+        $scope.submit = function () {
+            console.log($scope.data);
+            $http.post("@Url.Action("Create")", $scope.data).success(function(data) {
+                if (data && data.Successed) {
+                    location.href="@Url.Action("Index")";
+                }
+            });
+        }
+
+        $scope.data.productionChange = function() {
+            $scope.data.ProductionName = $scope.data.Production.productionName;
+            $scope.data.ProductionId = $scope.data.Production.id;
+        };
+
+
+    }]);
+
+    cementApp.run([
+        'bootstrap3ElementModifier',
+        function(bootstrap3ElementModifier) {
+            bootstrap3ElementModifier.enableValidationStateIcons(true);
+            //bootstrap3ElementModifier.setCulture('zh-cn');
+        }
+    ]);
+
+
+</script>
 
 <h2>Create</h2>
+<div ng-app="cementApp" >
+    <form name="dataForm" novalidate="novalidate" ng-submit="submit();" ng-controller="cementController">
 
-@using (Html.BeginForm()) 
-{
-    @Html.AntiForgeryToken()
-    
-    <div class="form-horizontal">
-        <h4>Cement</h4>
-        <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        <div class="form-group">
-            @*@Html.LabelFor(model => model.CreatedTime, htmlAttributes: new { @class = "control-label col-md-2" })*@
-            <label class="control-label col-md-2">时间：</label>
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.CreatedTime, new {@class = "form-control" })
-                @Html.ValidationMessageFor(model => model.CreatedTime, "", new { @class = "text-danger" })
+        <div class="form-horizontal">
+            <h4>Cement</h4>
+            <hr />
+            <div class="form-group">
+                <label class="control-label col-md-2">时间：</label>
+                <div class="col-md-10">
+                    <input id="CreatedTime" class="form-control" name="CreatedTime" ng-model="data.CreatedTime" type="text" required />
+                    
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">客户代码：</label>
+                <div class="col-md-10">
+                    <input class="form-control" name="CustomerId" ng-model="data.CustomerId" type="text" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">客户名称：</label>
+                <div class="col-md-10">
+                    <input class="form-control" name="CustomerName" ng-model="data.CustomerName" type="text" required />
+                </div>
+
+            </div>
+
+            @*<div class="form-group">
+                    <label class="control-label col-md-2">产品代码：</label>
+                    <div class="col-md-10">
+
+                        @Html.TextBoxFor(model => model.ProductionId, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.ProductionId, "", new { @class = "text-danger" })
+                    </div>
+                </div>*@
+
+            <div class="form-group">
+                <label class="control-label col-md-2">产品名称：</label>
+                <div class="col-md-10">
+                    <select class="form-control" ng-model="data.Production" ng-options="production.productionName for production in cement.productionList" ng-change="data.productionChange()"></select>
+                </div>
+                
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">出厂吨位：</label>
+                <div class="col-md-10">
+                    <input class="form-control" name="SendWeight" ng-model="data.SendWeight" type="number" required />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">实收吨位：</label>
+                <div class="col-md-10">
+                    <input class="form-control" name="ReceiveWeight" ng-model="data.ReceiveWeight" type="number" required />
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="control-label col-md-2">磅差：</label>
+                <div class="col-md-10">
+                    <label class="form-control" readonly="readonly">{{data.ReceiveWeight-data.SendWeight}}</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">出厂单价：</label>
+                <div class="col-md-10">
+                    <input class="form-control" name="SendUnitPrice" ng-model="data.SendUnitPrice" type="text" required />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">实收单价：</label>
+                <div class="col-md-10">
+                    <input class="form-control" name="ReceiveUnitPrice" ng-model="data.ReceiveUnitPrice" type="number" required />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2">价差：</label>
+                <div class="col-md-10">
+                    <label class="form-control" readonly="readonly">{{data.ReceiveUnitPrice-data.SendUnitPrice}}</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">合同运费单价：</label>
+                <div class="col-md-10">
+                    <input class="form-control" name="TransferUnitPriceInContract" ng-model="data.TransferUnitPriceInContract" type="number" required />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">实收运费单价：</label>
+                <div class="col-md-10">
+                    <input class="form-control" name="ReceiveTransferUnitPrice" ng-model="data.ReceiveTransferUnitPrice" type="number" required />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2">运差：</label>
+                <div class="col-md-10">
+                    <label class="form-control" readonly="readonly">{{data.ReceiveTransferUnitPrice-data.TransferUnitPriceInContract}}</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">司机姓名：</label>
+                <div class="col-md-10">
+                    <input class="form-control" name="DriverName" ng-model="data.DriverName" type="text" required />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2">应收金额(含运费)：</label>
+                <div class="col-md-10">
+                    <label class="form-control" readonly="readonly">{{data.ReceiveWeight*(data.ReceiveUnitPrice+data.TransferUnitPriceInContract)}}</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">实收金额(含运费)：</label>
+                <div class="col-md-10">
+                    <input class="form-control" name="PaidAmount" ng-model="data.PaidAmount" type="number" required />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2">应付运费金额：</label>
+                <div class="col-md-10">
+                    <label class="form-control" readonly="readonly">{{data.ReceiveWeight*data.ReceiveTransferUnitPrice}}</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2">已付运费金额：</label>
+                <div class="col-md-10">
+                    <input class="form-control" name="PaidReceiveAmount" ng-model="data.PaidReceiveAmount" type="number" required />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2">下欠应付运费金额：</label>
+                <div class="col-md-10">
+                    <label class="form-control" readonly="readonly">{{data.ReceiveWeight*data.ReceiveTransferUnitPrice-data.PaidReceiveAmount}}</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">备注：</label>
+                <div class="col-md-10">
+                    <textarea class="form-control" name="Remark" ng-model="data.Remark" type="text" required rows="3"></textarea>
+                </div>
+            </div>
+
+            @*<div class="form-group">
+                    @Html.LabelFor(model => model.OverDraft, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.OverDraft, new { @class = "form-control"  })
+                        @Html.ValidationMessageFor(model => model.OverDraft, "", new { @class = "text-danger" })
+                    </div>
+                </div>*@
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Create" class="btn btn-default" />
+                    <input type="reset" value="Reset" class="btn btn-warning" />
+                </div>
             </div>
         </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.CustomerId, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.CustomerId, new {  @class = "form-control" } )
-                @Html.ValidationMessageFor(model => model.CustomerId, "", new { @class = "text-danger" })
-            </div>
-        </div>
+    </form>
+</div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.CustomerName, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.CustomerName, new {  @class = "form-control"  })
-                @Html.ValidationMessageFor(model => model.CustomerName, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.ProductionId, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.ProductionId, new { @class = "form-control"  })
-                @Html.ValidationMessageFor(model => model.ProductionId, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.ProductionName, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.ProductionName, new { @class = "form-control" } )
-                @Html.ValidationMessageFor(model => model.ProductionName, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.SendWeight, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.SendWeight, new {  @class = "form-control"  })
-                @Html.ValidationMessageFor(model => model.SendWeight, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.ReceiveWeight, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.ReceiveWeight, new {@class = "form-control"  })
-                @Html.ValidationMessageFor(model => model.ReceiveWeight, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.SendUnitPrice, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.SendUnitPrice, new { @class = "form-control"  })
-                @Html.ValidationMessageFor(model => model.SendUnitPrice, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.ReceiveUnitPrice, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.ReceiveUnitPrice, new { @class = "form-control"  })
-                @Html.ValidationMessageFor(model => model.ReceiveUnitPrice, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.TransferUnitPriceInContract, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.TransferUnitPriceInContract, new { @class = "form-control"  })
-                @Html.ValidationMessageFor(model => model.TransferUnitPriceInContract, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.ReceiveTransferUnitPrice, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.ReceiveTransferUnitPrice, new { @class = "form-control"  })
-                @Html.ValidationMessageFor(model => model.ReceiveTransferUnitPrice, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.DriverName, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.DriverName, new { @class = "form-control"  })
-                @Html.ValidationMessageFor(model => model.DriverName, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.PaidAmount, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.PaidAmount, new {@class = "form-control"  })
-                @Html.ValidationMessageFor(model => model.PaidAmount, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.OverDraft, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.OverDraft, new { @class = "form-control"  })
-                @Html.ValidationMessageFor(model => model.OverDraft, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
-            </div>
-        </div>
-    </div>
-}
 
 <div>
     @Html.ActionLink("Back to List", "Index")
