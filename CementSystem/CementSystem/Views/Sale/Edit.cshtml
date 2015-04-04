@@ -1,7 +1,11 @@
-﻿@model CementSystem.Models.Cement
+﻿@using System.Threading
+@using System.Web
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Converters
+@model CementSystem.Models.Cement
 
 @{
-    ViewBag.Title = "录入";
+    ViewBag.Title = "编辑";
 }
 <script src="~/Scripts/jcs-auto-validate.js"></script>
 <link href="~/Content/bootstrap-datepicker3.min.css" rel="stylesheet" />
@@ -10,18 +14,24 @@
 
 <style>
     label {
-        max-width: 280px ;
+        max-width: 280px;
     }
+
     .form-control {
         border-width: 1px !important;
     }
-
 </style>
 
 <script>
+    @{
+        IsoDateTimeConverter timeFormat = new IsoDateTimeConverter();
+
+        timeFormat.DateTimeFormat = "yyyy年MM月dd日";  //Thread.CurrentThread.CurrentCulture.DateTimeFormat.ShortDatePattern;
+    }
+
     var cementApp = angular.module('cementApp', ['jcs-autoValidate']);
     cementApp.controller('cementController', ["$scope", "$http", "$window", "$timeout", 'bootstrap3ElementModifier', function ($scope, $http, $window, $timeout,bootstrap3ElementModifier) {
-        $scope.data = {};
+        $scope.data = @Html.Raw(JsonConvert.SerializeObject(Model,Newtonsoft.Json.Formatting.Indented, timeFormat));
         $scope.cement = {};
 
         //load production list
@@ -31,20 +41,9 @@
                 $scope.data.Production= $scope.cement.productionList[0];
             }
 
-        
+
         });
 
-        //todo move to json file , then can easy to maintain it
-        //$scope.cement.productionList = [
-        //    { id: 0, productionName: "散PCR32.5" },
-        //    { id: 0, productionName: "散PC32.5" },
-        //    { id: 0, productionName: "散PO42.5" },
-        //    { id: 0, productionName: "散52.5" },
-        //    { id: 0, productionName: "袋PCR32.5" },
-        //    { id: 0, productionName: "袋PC32.5" },
-        //    { id: 0, productionName: "袋PO42.5" },
-        //    { id: 0, productionName: "其他" }
-        //];
 
         $timeout(function() {
             $("#CreatedTime").datepicker({
@@ -57,7 +56,7 @@
 
         $scope.submit = function () {
             console.log($scope.data);
-            $http.post("@Url.Action("Create")", $scope.data).success(function(data) {
+            $http.post("@Url.Action("Edit")", $scope.data).success(function(data) {
                 if (data && data.Successed) {
                     location.href="@Url.Action("Index")";
                 }
@@ -83,14 +82,14 @@
 
 </script>
 
-<h2>录入信息</h2>
-<div ng-app="cementApp" >
+<h2>编辑信息</h2>
+<div ng-app="cementApp">
     <form name="dataForm" novalidate="novalidate" ng-submit="submit();" ng-controller="cementController">
 
         <div class="form-horizontal">
 
             <hr />
-            <div class="form-group col-md-6">
+            <div class="form-group">
                 <label class="control-label col-md-2">时间：</label>
                 <div class="col-md-10">
                     <input id="CreatedTime" class="form-control" name="CreatedTime" ng-model="data.CreatedTime" type="text" required />
@@ -99,14 +98,14 @@
 
             </div>
 
-            <div class="form-group col-md-6">
+            <div class="form-group">
                 <label class="control-label col-md-2">客户代码：</label>
                 <div class="col-md-10">
                     <input class="form-control" name="CustomerId" ng-model="data.CustomerId" type="text" />
                 </div>
             </div>
 
-            <div class="form-group col-md-6">
+            <div class="form-group">
                 <label class="control-label col-md-2">客户名称：</label>
                 <div class="col-md-10">
                     <input class="form-control" name="CustomerName" ng-model="data.CustomerName" type="text" required />
@@ -123,114 +122,114 @@
                     </div>
                 </div>*@
 
-            <div class="form-group col-md-6">
+            <div class="form-group">
                 <label class="control-label col-md-2">产品名称：</label>
                 <div class="col-md-10">
                     <select class="form-control" ng-model="data.Production" ng-options="production.productionName for production in cement.productionList" ng-change="data.productionChange()"></select>
                 </div>
-                
+
             </div>
 
-            <div class="form-group col-md-6">
+            <div class="form-group">
                 <label class="control-label col-md-2">出厂吨位：</label>
                 <div class="col-md-10">
                     <input class="form-control" name="SendWeight" ng-model="data.SendWeight" type="number" required />
                 </div>
             </div>
 
-            <div class="form-group  col-md-6">
+            <div class="form-group">
                 <label class="control-label col-md-2">实收吨位：</label>
                 <div class="col-md-10">
                     <input class="form-control" name="ReceiveWeight" ng-model="data.ReceiveWeight" type="number" required />
                 </div>
             </div>
-            
-            <div class="form-group  col-md-6">
+
+            <div class="form-group">
                 <label class="control-label col-md-2">磅差：</label>
                 <div class="col-md-10">
                     <label class="form-control" readonly="readonly">{{data.ReceiveWeight-data.SendWeight}}</label>
                 </div>
             </div>
 
-            <div class="form-group  col-md-6">
+            <div class="form-group">
                 <label class="control-label col-md-2">出厂单价：</label>
                 <div class="col-md-10">
                     <input class="form-control" name="SendUnitPrice" ng-model="data.SendUnitPrice" type="number" required />
                 </div>
             </div>
 
-            <div class="form-group  col-md-6">
+            <div class="form-group">
                 <label class="control-label col-md-2">实收单价：</label>
                 <div class="col-md-10">
                     <input class="form-control" name="ReceiveUnitPrice" ng-model="data.ReceiveUnitPrice" type="number" required />
                 </div>
             </div>
-            <div class="form-group  col-md-6">
+            <div class="form-group">
                 <label class="control-label col-md-2">价差：</label>
                 <div class="col-md-10">
                     <label class="form-control" readonly="readonly">{{data.ReceiveUnitPrice-data.SendUnitPrice}}</label>
                 </div>
             </div>
 
-            <div class="form-group  col-md-6">
+            <div class="form-group">
                 <label class="control-label col-md-2">合同运费单价：</label>
                 <div class="col-md-10">
                     <input class="form-control" name="TransferUnitPriceInContract" ng-model="data.TransferUnitPriceInContract" type="number" required />
                 </div>
             </div>
 
-            <div class="form-group  col-md-6">
+            <div class="form-group">
                 <label class="control-label col-md-2">实收运费单价：</label>
                 <div class="col-md-10">
                     <input class="form-control" name="ReceiveTransferUnitPrice" ng-model="data.ReceiveTransferUnitPrice" type="number" required />
                 </div>
             </div>
-            <div class="form-group  col-md-6">
+            <div class="form-group">
                 <label class="control-label col-md-2">运差：</label>
                 <div class="col-md-10">
                     <label class="form-control" readonly="readonly">{{data.ReceiveTransferUnitPrice-data.TransferUnitPriceInContract}}</label>
                 </div>
             </div>
 
-            <div class="form-group  col-md-6">
+            <div class="form-group">
                 <label class="control-label col-md-2">司机姓名：</label>
                 <div class="col-md-10">
                     <input class="form-control" name="DriverName" ng-model="data.DriverName" type="text" required />
                 </div>
             </div>
-            <div class="form-group  col-md-6">
+            <div class="form-group">
                 <label class="control-label col-md-2">应收金额(含运费)：</label>
                 <div class="col-md-10">
                     <label class="form-control" readonly="readonly">{{data.ReceiveWeight*(data.ReceiveUnitPrice+data.TransferUnitPriceInContract)}}</label>
                 </div>
             </div>
 
-            <div class="form-group  col-md-6">
+            <div class="form-group">
                 <label class="control-label col-md-2">实收金额(含运费)：</label>
                 <div class="col-md-10">
                     <input class="form-control" name="PaidAmount" ng-model="data.PaidAmount" type="number" required />
                 </div>
             </div>
-            <div class="form-group  col-md-6">
+            <div class="form-group">
                 <label class="control-label col-md-2">应付运费金额：</label>
                 <div class="col-md-10">
                     <label class="form-control" readonly="readonly">{{data.ReceiveWeight*data.ReceiveTransferUnitPrice}}</label>
                 </div>
             </div>
-            <div class="form-group  col-md-6">
+            <div class="form-group">
                 <label class="control-label col-md-2">已付运费金额：</label>
                 <div class="col-md-10">
                     <input class="form-control" name="PaidReceiveAmount" ng-model="data.PaidReceiveAmount" type="number" required />
                 </div>
             </div>
-            <div class="form-group  col-md-6">
+            <div class="form-group">
                 <label class="control-label col-md-2">下欠应付运费金额：</label>
                 <div class="col-md-10">
                     <label class="form-control" readonly="readonly">{{data.ReceiveWeight*data.ReceiveTransferUnitPrice-data.PaidReceiveAmount}}</label>
                 </div>
             </div>
 
-            <div class="form-group  col-md-6">
+            <div class="form-group">
                 <label class="control-label col-md-2">备注：</label>
                 <div class="col-md-10">
                     <textarea class="form-control" name="Remark" ng-model="data.Remark" type="text" required rows="3"></textarea>
@@ -245,7 +244,7 @@
                     </div>
                 </div>*@
 
-            <div class="form-group ">
+            <div class="form-group">
                 <div class="col-md-offset-2 col-md-10">
                     <input type="submit" value="Create" class="btn btn-default" />
                     <input type="reset" value="Reset" class="btn btn-warning" />

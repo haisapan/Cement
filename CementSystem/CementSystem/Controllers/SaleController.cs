@@ -1,4 +1,5 @@
 ﻿using System.Configuration;
+using System.Data.Entity;
 using System.Data.SQLite;
 using System.Linq;
 using System.Web.Mvc;
@@ -56,18 +57,31 @@ namespace CementSystem.Controllers
         // GET: Sale/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            saleDBEntities saleDbEntities = new saleDBEntities();
+            var cement=saleDbEntities.Cement.FirstOrDefault(p => p.Id == id);
+            if (cement!=null)
+            {
+                return View(cement);
+            }
+            return HttpNotFound();
         }
 
         // POST: Sale/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public ActionResult Edit(Cement model)
         {
             try
             {
-                // TODO: Add update logic here
-
-                return RedirectToAction("Index");
+                saleDBEntities saleDbEntities = new saleDBEntities();
+                saleDbEntities.Entry(model).State=EntityState.Modified;
+                saleDbEntities.SaveChanges();
+                var result = new
+                {
+                    Successed = true,
+                    Error = "",
+                    Message = ""
+                };
+                return Json(result);
             }
             catch
             {
