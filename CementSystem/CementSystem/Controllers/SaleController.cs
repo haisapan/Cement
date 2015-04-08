@@ -1,9 +1,14 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.Data.Entity;
 using System.Data.SQLite;
+using System.Globalization;
 using System.Linq;
+using System.Linq.Dynamic;
 using System.Web.Mvc;
 using CementSystem.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace CementSystem.Controllers
 {
@@ -112,19 +117,60 @@ namespace CementSystem.Controllers
         }
 
         [HttpPost]
-        public ActionResult GetSaleData(string strJson,string search)
+        public ActionResult GetSaleData(bool? _search, string nd, int page, int rows, string sidx, string sord, string filters, string customerName, string productionName, string driverName, string startDate,string endDate)
         {
             saleDBEntities saleDbEntities=new saleDBEntities();
             var cements=saleDbEntities.Cement.AsQueryable();
+
+            if (!string.IsNullOrEmpty(customerName))
+            {
+                cements =
+                    cements.Where(p => p.CustomerName != null && p.CustomerName.ToLower().Contains(customerName.ToLower()));
+            }
+            if (!string.IsNullOrEmpty(productionName))
+            {
+                cements =
+                    cements.Where(p => p.ProductionName != null && p.ProductionName.ToLower().Contains(productionName.ToLower()));
+            }
+            if (!string.IsNullOrEmpty(driverName))
+            {
+                cements =
+                    cements.Where(p => p.DriverName != null && p.DriverName.ToLower().Contains(driverName.ToLower()));
+            }
+            if (!string.IsNullOrEmpty(startDate))
+            {
+                var start=DateTime.Parse(startDate);
+                cements = cements.Where(p => p.CreatedTime != null && p.CreatedTime >= start);
+            }
+            if (!string.IsNullOrEmpty(endDate))
+            {
+                var end = DateTime.Parse(endDate);
+                cements = cements.Where(p => p.CreatedTime != null && p.CreatedTime <= end);
+            }
+
+
+            if (sidx != null)
+            {
+                sidx = sidx.Trim().EndsWith(sord) ? sidx : sidx.Trim() + " " + sord;
+            }
+
+            cements= cements.OrderBy(sidx);
             //cements.Where(p=>p.CreatedTime)
+            var count = cements.Count();
+            cements = cements.Skip((page - 1)*rows).Take(rows);
             var result = new
             {
-                total = cements.Count(), //总页数
-                page = 1,   //当前页数
-                records = cements.Count(),  //总记录数
+                total = Math.Ceiling((float) count/(float) rows), //总页数
+                page = page,   //当前页数
+                records = count,  //总记录数
                 rows = cements,   //总
             };
-            return Json(result);
+            
+            IsoDateTimeConverter timeFormat = new IsoDateTimeConverter();
+            timeFormat.DateTimeFormat = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern ;
+
+            var jsonResult=JsonConvert.SerializeObject(result, Formatting.Indented, timeFormat);
+            return Content(jsonResult);
         }
     }
 }

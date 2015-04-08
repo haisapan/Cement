@@ -1,88 +1,214 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Index";
 }
 
 <link href="~/Content/ui.jqgrid.css" rel="stylesheet" />
 <link href="~/Scripts/jqGrid/css/jquery-ui.custom.min.css" rel="stylesheet" />
 @*<link href="~/Content/ui.jqgrid-bootstarp.css" rel="stylesheet" />*@
-<script src="~/Scripts/jqGrid/js/jquery.jqGrid.min.js"></script>
+<script src="~/Scripts/jqGrid/js/jquery.jqGrid.src.js"></script>
 <script src="~/Scripts/jqGrid/js/jquery-ui-custom.min.js"></script>
 <script src="~/Scripts/jqGrid/js/i18n/grid.locale-cn.js"></script>
+<link href="~/Content/bootstrap-datepicker3.min.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-datepicker.min.js"></script>
+<script src="~/Scripts/bootstrap-datepicker.zh-CN.min.js"></script>
+<style>
+    .grid input, .grid button, .grid select, .grid textarea {
+        color: black;
+    }
+
+    .form-control {
+        border-width: 1px !important;
+        height: 32px;
+    }
+    .ui-pg-input {
+        height: 18px !important;
+    }
+</style>
 <h2>Index</h2>
 <div id="filters">
-    
+    <div class="form-group ">
+        <div class="row">
+            <div class="col-md-3">
+                <label class="control-label col-md-5">客户名称：</label>
+                <div class="col-md-7">
+                    <input id="customerName" class="form-control" type="text" />
+
+                </div>
+
+            </div>
+            <div class="col-md-3">
+                <label class="control-label col-md-5">产品：</label>
+                <div class="col-md-7">
+                    <input id="productionName" class="form-control" type="text" />
+
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label class="control-label col-md-3">起止时间：</label>
+                <div class="col-md-8">
+                    <div class="input-daterange input-group" id="datepicker">
+                        <input id="start" type="text" class="input-sm form-control" name="start" />
+                        <span class="input-group-addon">to</span>
+                        <input id="end" type="text" class="input-sm form-control" name="end" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-3">
+                <label class="control-label col-md-5">司机姓名：</label>
+                <div class="col-md-7">
+                    <input id="driverName" class="form-control" type="text" required />
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3">
+                <button class="btn btn-success btn-sm" onclick="querySaleHistory();">查询</button>
+
+
+            </div>
+        </div>
+
+        @*<div class="form-group col-md-4">
+                <label class="control-label col-md-4">客户名称：</label>
+                <div class="col-md-8">
+                    <input id="CreatedTime" class="form-control" name="CreatedTime" ng-model="data.CreatedTime" type="text" required />
+
+                </div>
+
+            </div>*@
+    </div>
+    <div class="clearfix"></div>
 </div>
-<table id="saleGrid"></table>
-<div id="saleGridPager"></div>
+<div class="grid">
+    <table id="saleGrid"></table>
+    <div id="saleGridPager"></div>
+</div>
+
 
 
 <script type="text/javascript">
-    $(function() {
+    $(function () {
+        $('.input-daterange').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            language: "zh-CN",
+            calendarWeeks: true,
+        });
+
         $("#saleGrid").jqGrid({
             url: '@Url.Action("GetSaleData")',
             autowidth: true,
             shrinkToFit: true,
             mtype: 'Post',
             datatype: 'json',
-            colNames: ['Id','客户'],
+            //colNames: ['Id', '时间', '客户', '产品', '司机', '吨位', '单价','应付金额','已付金额','下欠金额','实收运费单价','应付运费金额','已付运费金额','下欠应付运费金额','备注'],
             colModel: [
-                { index: 'Id', name: 'Id', key: true, width: 75 },
-                { index: 'CustomerName', name: "CustomerName", width: 100 }
+                //{ name: 'Id', label: 'Id', key: true, width: 75 },
+                { name: "CreatedTime", label: '时间', width: 70 },
+                { name: 'CustomerName', label: '客户', width: 75 },
+                { name: "ProductionName", label: '产品', width: 70 },
+                { name: 'DriverName', label: '司机', width: 75 },
+                { name: 'SendWeight', label: '出厂吨位', width: 75, summaryType: 'sum' },
+                { name: 'ReceiveWeight', label: '实收吨位', width: 75, summaryType: 'sum' },
+                { name: 'ReceiveUnitPrice', label: '实收单价', width: 75 },
+                { name: 'TransferUnitPriceInContract', label: '合同运费单价', width: 75 },
+                {
+                    name: 'OverDraft', label: '应收金额', width: 75, //summaryType: 'sum',
+                    unformat: groupUnFormatter,
+                    formatter: groupFormatter,
+                    summaryTpl: "<b class='sumItemName' style='color:red;'>{0}</b>",
+                    summaryType: getAllPagesItemsSummary
+                },
+                { name: 'PaidAmount', label: '实收金额', width: 75, summaryType: 'sum' },
+                //{
+                //    name: 'DriverName', label: '下欠金额', width: 75, summaryType: 'sum', formatter: function (data, options, rec) {
+                //        return rec.ReceiveWeight * (rec.ReceiveUnitPrice + rec.TransferUnitPriceInContract)-rec.PaidAmount;
+                //    }, unformat: function (data, options, rec) {
+                //        console.log(rec);
+
+                //        return rec.ReceiveWeight * (rec.ReceiveUnitPrice + rec.TransferUnitPriceInContract) - rec.PaidAmount;
+                //    }
+                //},
+                { name: 'DriverName', label: '实收运费单价', width: 75 },
+                //{ name: '应付运费金额', label: '应付运费金额', width: 75, summaryType: 'sum' },
+                //{ name: '已付运费金额', label: '已付运费金额', width: 75, summaryType: 'sum' },
+                { name: '下欠应付运费金额', label: '下欠应付运费金额', width: 75 },
+                { name: 'Remark', label: '备注', width: 75 },
             ],
             postData: {
-                strJson: getFilterStr,
-                //search:function(){return "search1";}
+                customerName :function () {return $("#customerName").val();},
+                productionName:function (){return $("#productionName").val(); },
+                driverName:function(){return $("#driverName").val();},
+                startDate:function (){return $("#start").val();},
+                endDate:function(){return $("#end").val();},
+
             },
+
             viewrecords: true,
-            width: 1000,
+            //width: 1000,
+            sortname: 'Id',
             height: 500,
             rowNum: 20,
-            rowList: [20, 30, 50, 100],
+            rowList: [20,  50, 100,500],
             pager: "#saleGridPager",
-            caption: '1',
-            grouping: false,
+            //caption: '1',
+            grouping: true,
             groupingView: {
-                groupField: ["Id"],
+                groupField: ["CustomerName"],
                 groupColumnShow: [true],
                 //groupText: ["<b>{0}</b>"],
                 groupText: ["<b class='firstGroupValue'>{0}</b>", "<span class='secondGroupValue'>{0}</span>"],
                 groupOrder: ["asc"],
                 groupSummary: [true],
-                groupSummaryPos: ['header', 'header'],
+                groupSummaryPos: ['footer', 'header'],
                 groupCollapse: false
             },
-            //localReader: {
-            //    repeatitems: false,
-            //    id: "Id",
-            //    cell: "",
-            //    root: function (obj) { return obj.rows; },
-            //    page: function (obj) { return 1; },
-            //    total: function (obj) { return 1; },
-            //    records: function (obj) { return obj.records; }
-            //}
         });
 
-        
+
     });
 
-    function loadData() {
-        //$("#saleGrid")[0].grid.beginReq();
+    //function loadData() {
+    //    $("#saleGrid").trigger('reloadGrid');
 
+    //};
+    function groupFormatter(data, options, rec) {
+        return parseFloat(rec.ReceiveWeight * (rec.ReceiveUnitPrice + rec.TransferUnitPriceInContract));
+    }
+    function groupUnFormatter(data, options, rec) {
+        console.log(rec);
+        return parseFloat(rec.ReceiveWeight * (rec.ReceiveUnitPrice + rec.TransferUnitPriceInContract));
+    }
+
+    function getFilters() {
+        var filters = {};
+        filters.customerName = $("#customerName").val();
+        filters.productionName = $("#productionName").val();
+        filters.driverName = $("#driverName").val();
+        filters.startDate = $("#start").val();
+        filters.endDate = $("#end").val();
+        console.log(filters);
+        return filters;
+    }
+
+    function querySaleHistory() {
+        //loadData();
         $("#saleGrid").trigger('reloadGrid');
-        //$("#saleGrid")[0].grid.endReq();
-        @*$.post('@Url.Action("GetSaleData")', {}, function (data) {
-            console.log(data);
-            $("#saleGrid").jqGrid('setGridParam', { datatype: 'json', postData: {
-                strJson: function () { return 'haisa'; },
-                search:function(){return "search1";}
-            } });
-            $("#saleGrid")[0].grid.endReq();
-            $("#saleGrid").trigger('reloadGrid');
-        });*@
-    };
+    }
 
-    function getFilterStr() {
-        return "tst";
+    var sum = 0;
+    function getAllPagesItemsSummary(val, name, rec) {
+        val = parseFloat(val || 0) + 1;
+        console.log(rec);
+       var shouldPaid= rec.ReceiveWeight * (rec.ReceiveUnitPrice + rec.TransferUnitPriceInContract)
+       
+       sum += parseFloat(shouldPaid);
+        //count++;
+        console.log(sum);
+        return parseFloat(sum||0);
     }
 </script>
