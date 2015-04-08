@@ -3,5 +3,86 @@
     ViewBag.Title = "Index";
 }
 
+<link href="~/Content/ui.jqgrid.css" rel="stylesheet" />
+<link href="~/Scripts/jqGrid/css/jquery-ui.custom.min.css" rel="stylesheet" />
+@*<link href="~/Content/ui.jqgrid-bootstarp.css" rel="stylesheet" />*@
+<script src="~/Scripts/jqGrid/js/jquery.jqGrid.min.js"></script>
+<script src="~/Scripts/jqGrid/js/jquery-ui-custom.min.js"></script>
+<script src="~/Scripts/jqGrid/js/i18n/grid.locale-cn.js"></script>
 <h2>Index</h2>
+<div id="filters">
+    
+</div>
+<table id="saleGrid"></table>
+<div id="saleGridPager"></div>
 
+
+<script type="text/javascript">
+    $(function() {
+        $("#saleGrid").jqGrid({
+            url: '@Url.Action("GetSaleData")',
+            autowidth: true,
+            shrinkToFit: true,
+            mtype: 'Post',
+            datatype: 'json',
+            colNames: ['Id','客户'],
+            colModel: [
+                { index: 'Id', name: 'Id', key: true, width: 75 },
+                { index: 'CustomerName', name: "CustomerName", width: 100 }
+            ],
+            postData: {
+                strJson: getFilterStr,
+                //search:function(){return "search1";}
+            },
+            viewrecords: true,
+            width: 1000,
+            height: 500,
+            rowNum: 20,
+            rowList: [20, 30, 50, 100],
+            pager: "#saleGridPager",
+            caption: '1',
+            grouping: false,
+            groupingView: {
+                groupField: ["Id"],
+                groupColumnShow: [true],
+                //groupText: ["<b>{0}</b>"],
+                groupText: ["<b class='firstGroupValue'>{0}</b>", "<span class='secondGroupValue'>{0}</span>"],
+                groupOrder: ["asc"],
+                groupSummary: [true],
+                groupSummaryPos: ['header', 'header'],
+                groupCollapse: false
+            },
+            //localReader: {
+            //    repeatitems: false,
+            //    id: "Id",
+            //    cell: "",
+            //    root: function (obj) { return obj.rows; },
+            //    page: function (obj) { return 1; },
+            //    total: function (obj) { return 1; },
+            //    records: function (obj) { return obj.records; }
+            //}
+        });
+
+        
+    });
+
+    function loadData() {
+        //$("#saleGrid")[0].grid.beginReq();
+
+        $("#saleGrid").trigger('reloadGrid');
+        //$("#saleGrid")[0].grid.endReq();
+        @*$.post('@Url.Action("GetSaleData")', {}, function (data) {
+            console.log(data);
+            $("#saleGrid").jqGrid('setGridParam', { datatype: 'json', postData: {
+                strJson: function () { return 'haisa'; },
+                search:function(){return "search1";}
+            } });
+            $("#saleGrid")[0].grid.endReq();
+            $("#saleGrid").trigger('reloadGrid');
+        });*@
+    };
+
+    function getFilterStr() {
+        return "tst";
+    }
+</script>

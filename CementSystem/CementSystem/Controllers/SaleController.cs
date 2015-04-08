@@ -110,5 +110,21 @@ namespace CementSystem.Controllers
                 return View();
             }
         }
+
+        [HttpPost]
+        public ActionResult GetSaleData(string strJson,string search)
+        {
+            saleDBEntities saleDbEntities=new saleDBEntities();
+            var cements=saleDbEntities.Cement.AsQueryable();
+            //cements.Where(p=>p.CreatedTime)
+            var result = new
+            {
+                total = cements.Count(), //总页数
+                page = 1,   //当前页数
+                records = cements.Count(),  //总记录数
+                rows = cements,   //总
+            };
+            return Json(result);
+        }
     }
 }
