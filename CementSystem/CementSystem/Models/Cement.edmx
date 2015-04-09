@@ -25,6 +25,7 @@
           <Property Name="OverDraft" Type="real" />
           <Property Name="CreatedTime" Type="datetime" />
           <Property Name="Remark" Type="nvarchar" MaxLength="2147483647" />
+          <Property Name="PaidTransferAmount" Type="real" />
         </EntityType>
         <EntityContainer Name="saleDBModelStoreContainer">
           <EntitySet Name="Cement" EntityType="Self.Cement" store:Type="Tables" />
@@ -53,6 +54,7 @@
           <Property Name="OverDraft" Type="Double" />
           <Property Name="CreatedTime" Type="DateTime" />
           <Property Name="Remark" Type="String" MaxLength="2147483647" FixedLength="false" Unicode="true" />
+          <Property Name="PaidTransferAmount" Type="Double" />
         </EntityType>
         <EntityContainer Name="saleDBEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Cement" EntityType="Self.Cement" />
@@ -66,6 +68,7 @@
           <EntitySetMapping Name="Cement">
             <EntityTypeMapping TypeName="saleDBModel.Cement">
               <MappingFragment StoreEntitySet="Cement">
+                <ScalarProperty Name="PaidTransferAmount" ColumnName="PaidTransferAmount" />
                 <ScalarProperty Name="Remark" ColumnName="Remark" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />

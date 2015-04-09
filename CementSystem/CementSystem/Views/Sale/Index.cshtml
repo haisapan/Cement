@@ -20,6 +20,7 @@
         border-width: 1px !important;
         height: 32px;
     }
+
     .ui-pg-input {
         height: 18px !important;
     }
@@ -65,30 +66,36 @@
 
             </div>
 
-            <div class="col-md-3">
-                <button class="btn btn-success btn-sm" onclick="querySaleHistory();">查询</button>
+            <div class="col-md-8">
+                <button class="btn btn-success btn-sm col-md-2" onclick="querySaleHistory();">查询</button>
 
+                <label class="control-label col-md-3" style="display: inline">分组：</label>
+                <select id="chngroup" class=" form-control col-md-4" style="padding: 0;">
+                    <option value="CustomerName" selected="selected">客户</option>
+                    <option value="ProductionName">产品</option>
+                    <option value="DriverName">司机</option>
+                    <option value="clear" selected="selected">取消分组</option>
+                </select>
 
             </div>
+
+            @*<div class="form-group col-md-4">
+                    <label class="control-label col-md-4">客户名称：</label>
+                    <div class="col-md-8">
+                        <input id="CreatedTime" class="form-control" name="CreatedTime" ng-model="data.CreatedTime" type="text" required />
+
+                    </div>
+
+                </div>*@
         </div>
-
-        @*<div class="form-group col-md-4">
-                <label class="control-label col-md-4">客户名称：</label>
-                <div class="col-md-8">
-                    <input id="CreatedTime" class="form-control" name="CreatedTime" ng-model="data.CreatedTime" type="text" required />
-
-                </div>
-
-            </div>*@
+        <div class="clearfix"></div>
     </div>
-    <div class="clearfix"></div>
-</div>
-<div class="grid">
-    <table id="saleGrid"></table>
-    <div id="saleGridPager"></div>
-</div>
+    <div class="grid">
+        <table id="saleGrid"></table>
+        <div id="saleGridPager"></div>
+    </div>
 
-
+</div>
 
 <script type="text/javascript">
     $(function () {
@@ -107,7 +114,11 @@
             datatype: 'json',
             //colNames: ['Id', '时间', '客户', '产品', '司机', '吨位', '单价','应付金额','已付金额','下欠金额','实收运费单价','应付运费金额','已付运费金额','下欠应付运费金额','备注'],
             colModel: [
-                //{ name: 'Id', label: 'Id', key: true, width: 75 },
+                {
+                    name: 'Id', label: '序号', key: true, width: 50, formatter: function (cell, options, rec) {
+                        return '<div style="text-align:center;"><a href="/Sale/Edit/' + cell + '" >编辑</a></div>';
+                    }
+                },
                 { name: "CreatedTime", label: '时间', width: 70 },
                 { name: 'CustomerName', label: '客户', width: 75 },
                 { name: "ProductionName", label: '产品', width: 70 },
@@ -116,35 +127,21 @@
                 { name: 'ReceiveWeight', label: '实收吨位', width: 75, summaryType: 'sum' },
                 { name: 'ReceiveUnitPrice', label: '实收单价', width: 75 },
                 { name: 'TransferUnitPriceInContract', label: '合同运费单价', width: 75 },
-                {
-                    name: 'OverDraft', label: '应收金额', width: 75, //summaryType: 'sum',
-                    unformat: groupUnFormatter,
-                    formatter: groupFormatter,
-                    summaryTpl: "<b class='sumItemName' style='color:red;'>{0}</b>",
-                    summaryType: getAllPagesItemsSummary
-                },
+                { name: 'ShouldPaidAmount', label: '应收金额', width: 75, summaryType: 'sum' },
                 { name: 'PaidAmount', label: '实收金额', width: 75, summaryType: 'sum' },
-                //{
-                //    name: 'DriverName', label: '下欠金额', width: 75, summaryType: 'sum', formatter: function (data, options, rec) {
-                //        return rec.ReceiveWeight * (rec.ReceiveUnitPrice + rec.TransferUnitPriceInContract)-rec.PaidAmount;
-                //    }, unformat: function (data, options, rec) {
-                //        console.log(rec);
-
-                //        return rec.ReceiveWeight * (rec.ReceiveUnitPrice + rec.TransferUnitPriceInContract) - rec.PaidAmount;
-                //    }
-                //},
-                { name: 'DriverName', label: '实收运费单价', width: 75 },
-                //{ name: '应付运费金额', label: '应付运费金额', width: 75, summaryType: 'sum' },
-                //{ name: '已付运费金额', label: '已付运费金额', width: 75, summaryType: 'sum' },
-                { name: '下欠应付运费金额', label: '下欠应付运费金额', width: 75 },
+                { name: 'NotPaidAmount', label: '下欠金额', width: 75, summaryType: 'sum', },
+                { name: 'ReceiveTransferUnitPrice', label: '实收运费单价', width: 75 },
+                { name: 'ShouldPaidTransferAmount', label: '应付运费金额', width: 75, summaryType: 'sum' },
+                { name: 'PaidTransferReceiveAmount', label: '已付运费金额', width: 75, summaryType: 'sum' },
+                { name: 'NotPaidTransferAmount', label: '下欠应付运费金额', width: 75, summaryType: 'sum' },
                 { name: 'Remark', label: '备注', width: 75 },
             ],
             postData: {
-                customerName :function () {return $("#customerName").val();},
-                productionName:function (){return $("#productionName").val(); },
-                driverName:function(){return $("#driverName").val();},
-                startDate:function (){return $("#start").val();},
-                endDate:function(){return $("#end").val();},
+                customerName: function () { return $("#customerName").val(); },
+                productionName: function () { return $("#productionName").val(); },
+                driverName: function () { return $("#driverName").val(); },
+                startDate: function () { return $("#start").val(); },
+                endDate: function () { return $("#end").val(); },
 
             },
 
@@ -153,10 +150,10 @@
             sortname: 'Id',
             height: 500,
             rowNum: 20,
-            rowList: [20,  50, 100,500],
+            rowList: [20, 50, 100, 500],
             pager: "#saleGridPager",
             //caption: '1',
-            grouping: true,
+            grouping: false,
             groupingView: {
                 groupField: ["CustomerName"],
                 groupColumnShow: [true],
@@ -169,20 +166,11 @@
             },
         });
 
-
+        $("#chngroup").change(function () {
+            groupLog();
+        });
     });
 
-    //function loadData() {
-    //    $("#saleGrid").trigger('reloadGrid');
-
-    //};
-    function groupFormatter(data, options, rec) {
-        return parseFloat(rec.ReceiveWeight * (rec.ReceiveUnitPrice + rec.TransferUnitPriceInContract));
-    }
-    function groupUnFormatter(data, options, rec) {
-        console.log(rec);
-        return parseFloat(rec.ReceiveWeight * (rec.ReceiveUnitPrice + rec.TransferUnitPriceInContract));
-    }
 
     function getFilters() {
         var filters = {};
@@ -200,15 +188,15 @@
         $("#saleGrid").trigger('reloadGrid');
     }
 
-    var sum = 0;
-    function getAllPagesItemsSummary(val, name, rec) {
-        val = parseFloat(val || 0) + 1;
-        console.log(rec);
-       var shouldPaid= rec.ReceiveWeight * (rec.ReceiveUnitPrice + rec.TransferUnitPriceInContract)
-       
-       sum += parseFloat(shouldPaid);
-        //count++;
-        console.log(sum);
-        return parseFloat(sum||0);
-    }
+    function groupLog() {
+        var groupFilter = $("#chngroup").val();
+        console.log(groupFilter);
+        if (groupFilter != "clear") {
+            $("#saleGrid").jqGrid('groupingGroupBy', groupFilter);
+        }
+        else {
+            $("#saleGrid").jqGrid('groupingRemove', true);
+        }
+    };
+
 </script>

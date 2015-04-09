@@ -158,12 +158,35 @@ namespace CementSystem.Controllers
             //cements.Where(p=>p.CreatedTime)
             var count = cements.Count();
             cements = cements.Skip((page - 1)*rows).Take(rows);
+
+            var cementModelList = cements.Select(p => new
+            {
+                Id=p.Id,
+                CustomerName=p.CustomerName,
+                ProductionName = p.ProductionName,
+                SendWeight = p.SendWeight,
+                ReceiveWeight = p.ReceiveWeight,
+                SendUnitPrice = p.SendUnitPrice,
+                ReceiveUnitPrice = p.ReceiveUnitPrice,
+                TransferUnitPriceInContract = p.TransferUnitPriceInContract,
+                ReceiveTransferUnitPrice = p.ReceiveTransferUnitPrice,
+                DriverName = p.DriverName,
+                PaidAmount = p.PaidAmount,
+                OverDraft = p.OverDraft,
+                CreatedTime = p.CreatedTime,
+                Remark = p.Remark,
+                ShouldPaidAmount = p.ReceiveWeight * (p.ReceiveUnitPrice + p.TransferUnitPriceInContract),
+                NotPaidAmount = p.ReceiveWeight * (p.ReceiveUnitPrice + p.TransferUnitPriceInContract) - p.PaidAmount,
+                ShouldPaidTransferAmount = p.ReceiveWeight * p.ReceiveTransferUnitPrice,
+                PaidTransferAmount = p.PaidTransferAmount,
+                NotPaidTransferAmount = p.ReceiveWeight * p.ReceiveTransferUnitPrice - p.PaidTransferAmount,
+            });
             var result = new
             {
                 total = Math.Ceiling((float) count/(float) rows), //总页数
                 page = page,   //当前页数
                 records = count,  //总记录数
-                rows = cements,   //总
+                rows = cementModelList,   //总
             };
             
             IsoDateTimeConverter timeFormat = new IsoDateTimeConverter();
